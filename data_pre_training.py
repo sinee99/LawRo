@@ -67,12 +67,12 @@ def preprocess_pdf(pdf_path, source, doc_type, date, output_path):
     articles = split_articles_full(cleaned_text)
     add_metadata_and_save(articles, source, doc_type, date, output_path)
 
-# ====== 실행 예시 ======
+# ====== 수정하여 사용 ======
 if __name__ == "__main__":
-    pdf_path = r"C:\Users\sinee\Documents\VSCODE\LawRo\law_mwage.pdf"
-    source = "외국인고용법"
+    pdf_path = r"C:\Users\sinee\Documents\VSCODE\LawRo\law_data\law_mwage.pdf"
+    source = "최저임금법"
     doc_type = "법령"
-    date = "2022-12-11"
-    output_path = r"C:\Users\sinee\Documents\VSCODE\LawRo\law_mwage_processed.json"
+    date = "2020-05-26"
+    output_path = r"C:\Users\sinee\Documents\VSCODE\LawRo\law_data\law_mwage_processed.json"
     preprocess_pdf(pdf_path, source, doc_type, date, output_path)
     print("완료! 결과 파일:", output_path)
