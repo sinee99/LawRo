@@ -1,2 +1,2 @@
 .env
-chroma_db/*.bin
+chroma_db
