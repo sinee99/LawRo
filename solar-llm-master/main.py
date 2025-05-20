@@ -1,77 +1,83 @@
-# app.py (최종 Streamlit 앱)
 import os
 from dotenv import load_dotenv
 load_dotenv()
+
 import streamlit as st
 import time
-import uuid
 from langchain_upstage import UpstageEmbeddings, ChatUpstage
-from langchain_chroma import Chroma
-from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_community.vectorstores import Chroma
 from langchain.chains import create_history_aware_retriever, create_retrieval_chain
 from langchain.chains.combine_documents import create_stuff_documents_chain
+from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
+from langchain_core.messages import HumanMessage, SystemMessage
 
-# 세션 초기화
-if "id" not in st.session_state:
-    st.session_state.id = uuid.uuid4()
-    st.session_state.messages = []
+# ▶️ 벡터 저장된 디렉토리에서 불러오기
+embedding = UpstageEmbeddings(
+    model="solar-embedding-1-large",
+    upstage_api_key=os.getenv("UPSTAGE_API_KEY")
+)
 
-# 저장된 벡터스토어 로드
-@st.cache_resource(show_spinner="📂 저장된 문서 로딩 중...")
-def load_vectorstore():
-    return Chroma(
-        persist_directory="chroma_db",
-        embedding_function=UpstageEmbeddings(model="solar-embedding-1-large")
-    ).as_retriever(k=2)
+vectorstore = Chroma(
+    persist_directory="chroma_db",
+    embedding_function=embedding
+)
+retriever = vectorstore.as_retriever(k=2)
 
-retriever = load_vectorstore()
-chat = ChatUpstage(upstage_api_key=os.getenv("UPSTAGE_API_KEY"), model="solar-pro")
+# ▶️ 챗봇 초기화
+chat = ChatUpstage(
+    model="solar-pro",
+    upstage_api_key=os.getenv("UPSTAGE_API_KEY")
+)
 
-# 체인 구성
-contextualize_q_prompt = ChatPromptTemplate.from_messages([
-    ("system", """이전 대화 내용과 최신 사용자 질문이 있을 때, 이 질문이 이전 대화 내용과 관련이 있을 수 있습니다. 
-    이런 경우, 대화 내용을 알 필요 없이 독립적으로 이해할 수 있는 질문으로 바꾸세요. 
-    질문에 답할 필요는 없고, 필요하다면 그저 다시 구성하거나 그대로 두세요."""),
-    MessagesPlaceholder("chat_history"),
-    ("human", "{input}"),
-])
-history_aware_retriever = create_history_aware_retriever(chat, retriever, contextualize_q_prompt)
+# ▶️ 문맥 재구성 프롬프트
+contextualize_q_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", 
+         "이전 대화 내용과 사용자 질문을 바탕으로, 문맥 없이도 이해할 수 있도록 질문을 다시 표현하세요."),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
 
-qa_prompt = ChatPromptTemplate.from_messages([
-    ("system", """질문-답변 업무를 돕는 보조원입니다. 
-질문에 답하기 위해 검색된 내용을 사용하세요. 
-답을 모르면 모른다고 말하세요. 
-답변은 세 문장 이내로 간결하게 유지하세요.
+history_aware_retriever = create_history_aware_retriever(
+    chat, retriever, contextualize_q_prompt
+)
 
-## 답변 예시
-📍답변 내용: 
-📍증거: 
+# ▶️ 문서 기반 QA 프롬프트
+qa_prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", 
+         """질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.
+         
+📍답변 내용:  
+📍출처 문서: {context}"""),
+        MessagesPlaceholder("chat_history"),
+        ("human", "{input}"),
+    ]
+)
 
-{context}"""),
-    MessagesPlaceholder("chat_history"),
-    ("human", "{input}"),
-])
 question_answer_chain = create_stuff_documents_chain(chat, qa_prompt)
 rag_chain = create_retrieval_chain(history_aware_retriever, question_answer_chain)
 
-# 제목 표시
-st.title("📚 LawRo 법률 챗봇")
+# ▶️ Streamlit 인터페이스
+st.title("📚 LawRo 법률 상담 Chatbot")
 
-# 이전 대화 출력
+if "messages" not in st.session_state:
+    st.session_state.messages = []
+
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-MAX_MESSAGES_BEFORE_DELETION = 4
+MAX_MESSAGES = 4
 
-if prompt := st.chat_input("법률 관련 질문을 입력하세요!"):
-    if len(st.session_state.messages) >= MAX_MESSAGES_BEFORE_DELETION:
-        del st.session_state.messages[0:2]
+if prompt := st.chat_input("법률 관련 질문을 입력하세요."):
+    if len(st.session_state.messages) >= MAX_MESSAGES:
+        del st.session_state.messages[0]
+        del st.session_state.messages[0]
 
+    st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
-
-    with st.chat_message("user"):
-        st.markdown(prompt)
 
     with st.chat_message("assistant"):
         message_placeholder = st.empty()
@@ -82,13 +88,20 @@ if prompt := st.chat_input("법률 관련 질문을 입력하세요!"):
             "chat_history": st.session_state.messages
         })
 
-        with st.expander("📌 참고 문서"):
-            st.write(result["context"])
+        # ▶️ 문서 출처 추출
+        sources = set()
+        for doc in result.get("context", []):
+            src = doc.metadata.get("source", "Unknown")
+            sources.add(src)
 
-        for chunk in result["answer"].split(" "):
+        answer = result["answer"]
+        sources_list = "\n".join(f"📄 {src}" for src in sources)
+        final_response = f"{answer.strip()}\n\n🔎 **출처 문서:**\n{sources_list}"
+
+        for chunk in final_response.split(" "):
             full_response += chunk + " "
-            time.sleep(0.02)
             message_placeholder.markdown(full_response + "▌")
+            time.sleep(0.02)
         message_placeholder.markdown(full_response)
 
     st.session_state.messages.append({"role": "assistant", "content": full_response})
