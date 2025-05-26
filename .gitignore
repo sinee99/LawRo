@@ -1,3 +1,6 @@
 .env
 chroma_db/*
 chroma_db/*.bin
+OCR/.env
+OCR/__pycache__/*
+OCR/chroma_db/*
