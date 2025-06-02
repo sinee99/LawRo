@@ -2,9 +2,9 @@ from fastapi import APIRouter, HTTPException
 import time
 from typing import Dict, Any, List
 
-from ..models.request_models import ChatRequest
-from ..models.response_models import ChatResponse, ChatMessage
-from ..services.chat_service import ChatService
+from models.request_models import ChatRequest
+from models.response_models import ChatResponse, ChatMessage
+from services.chat_service import ChatService
 
 router = APIRouter()
 chat_service = ChatService()
@@ -73,6 +73,31 @@ async def get_chat_history(session_id: str):
             detail=f"채팅 히스토리 조회 중 오류가 발생했습니다: {str(e)}"
         )
 
+@router.get("/context/{session_id}")
+async def get_context_documents(session_id: str):
+    """
+    특정 세션의 마지막 응답에 사용된 컨텍스트 문서를 조회합니다.
+    
+    Args:
+        session_id: 세션 ID
+    
+    Returns:
+        Dict: 컨텍스트 문서 정보
+    """
+    try:
+        context_docs = chat_service.get_context_documents(session_id)
+        return {
+            "success": True,
+            "session_id": session_id,
+            "context_documents": context_docs,
+            "document_count": len(context_docs)
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, 
+            detail=f"컨텍스트 문서 조회 중 오류가 발생했습니다: {str(e)}"
+        )
+
 @router.delete("/history/{session_id}")
 async def clear_chat_history(session_id: str):
     """
@@ -125,9 +150,10 @@ async def chat_health_check():
         "status": "healthy",
         "service": "Chat",
         "components": {
+            "rag_chain": "operational",
             "llm": "operational",
-            "session_manager": "operational",
-            "memory": "operational"
+            "vectorstore": "operational",
+            "session_manager": "operational"
         },
         "timestamp": time.time()
     } 

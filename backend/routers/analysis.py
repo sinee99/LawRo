@@ -5,8 +5,8 @@ import tempfile
 import os
 from typing import Dict, Any
 
-from ..models.request_models import TextAnalysisRequest, LLMJudgmentRequest, RAGSearchRequest, PDFExportRequest
-from ..models.response_models import (
+from models.request_models import TextAnalysisRequest, LLMJudgmentRequest, RAGSearchRequest, PDFExportRequest
+from models.response_models import (
     AnalysisResponse, 
     ViolationCheckResponse, 
     LLMJudgmentResponse, 
@@ -15,11 +15,11 @@ from ..models.response_models import (
     RequiredFieldsResult,
     OCRResponse
 )
-from ..services.analysis_service import AnalysisService
-from ..services.ocr_service import OCRService
-from ..services.llm_service import LLMService
-from ..services.rag_service import RAGService
-from ..services.pdf_service import PDFService
+from services.analysis_service import AnalysisService
+from services.ocr_service import OCRService
+from services.llm_service import LLMService
+from services.rag_service import RAGService
+from services.pdf_service import PDFService
 
 router = APIRouter()
 
