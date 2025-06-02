@@ -16,7 +16,7 @@ embedding = UpstageEmbeddings(
 )
 
 vectorstore = Chroma(
-    persist_directory="chroma_db",
+    persist_directory="../storage/chroma_db",
     embedding_function=embedding
 )
 

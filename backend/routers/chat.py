@@ -15,7 +15,7 @@ async def send_chat_message(request: ChatRequest):
     채팅 메시지를 보내고 AI 응답을 받습니다.
     
     Args:
-        request: 채팅 요청 (메시지, 세션ID, 문맥)
+        request: 채팅 요청 (메시지, 세션ID, 문맥, 커스텀 프롬프트)
     
     Returns:
         ChatResponse: 채팅 응답
@@ -27,7 +27,8 @@ async def send_chat_message(request: ChatRequest):
         response_message, chat_history = await chat_service.process_message(
             message=request.message,
             session_id=request.session_id,
-            context=request.context
+            context=request.context,
+            custom_prompt=request.custom_prompt
         )
         
         processing_time = time.time() - start_time

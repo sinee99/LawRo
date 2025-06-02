@@ -12,6 +12,7 @@ class ChatRequest(BaseModel):
     message: str = Field(..., description="사용자 메시지", min_length=1)
     session_id: Optional[str] = Field(None, description="세션 ID")
     context: Optional[str] = Field(None, description="문맥 정보 (계약서 내용)")
+    custom_prompt: Optional[str] = Field(None, description="커스텀 QA 프롬프트 (설정하지 않으면 기본 프롬프트 사용)")
 
 class RAGSearchRequest(BaseModel):
     """RAG 검색 요청 모델"""

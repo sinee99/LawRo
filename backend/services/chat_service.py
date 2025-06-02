@@ -38,7 +38,7 @@ class ChatService:
             
             # 벡터스토어 로딩
             self.vectorstore = Chroma(
-                persist_directory="../chroma_db",  # 프로젝트 루트의 chroma_db 사용
+                persist_directory="../storage/chroma_db",  # 프로젝트 루트의 chroma_db 사용
                 embedding_function=self.embedding
             )
             self.retriever = self.vectorstore.as_retriever(k=2)
@@ -61,22 +61,12 @@ class ChatService:
                 self.chat_llm, self.retriever, contextualize_q_prompt
             )
             
-            # QA 프롬프트
-            qa_prompt = ChatPromptTemplate.from_messages([
-                ("system", 
-                 """질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.
+            # 기본 QA 프롬프트 정의
+            self.default_qa_prompt_text = """질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.
 
 📍답변 내용:  
-📍출처 문서: {context}"""),
-                MessagesPlaceholder("chat_history"),
-                ("human", "{input}"),
-            ])
+📍출처 문서: {context}"""
             
-            # QA 체인 생성
-            question_answer_chain = create_stuff_documents_chain(self.chat_llm, qa_prompt)
-            
-            # 최종 RAG 체인
-            self.rag_chain = create_retrieval_chain(self.history_aware_retriever, question_answer_chain)
             print("✅ RAG 체인 초기화 완료")
             
         except Exception as e:
@@ -93,11 +83,33 @@ class ChatService:
                 print(f"❌ LLM 초기화도 실패: {llm_error}")
                 self.chat_llm = None
 
+    def _create_rag_chain_with_prompt(self, custom_prompt: Optional[str] = None):
+        """커스텀 프롬프트로 RAG 체인을 동적 생성합니다."""
+        if not hasattr(self, 'history_aware_retriever') or not self.history_aware_retriever:
+            return None
+            
+        # 프롬프트 선택 (커스텀 또는 기본)
+        prompt_text = custom_prompt if custom_prompt else self.default_qa_prompt_text
+        
+        # QA 프롬프트 생성
+        qa_prompt = ChatPromptTemplate.from_messages([
+            ("system", prompt_text),
+            MessagesPlaceholder("chat_history"),
+            ("human", "{input}"),
+        ])
+        
+        # QA 체인 생성
+        question_answer_chain = create_stuff_documents_chain(self.chat_llm, qa_prompt)
+        
+        # RAG 체인 반환
+        return create_retrieval_chain(self.history_aware_retriever, question_answer_chain)
+
     async def process_message(
         self, 
         message: str, 
         session_id: Optional[str] = None,
-        context: Optional[str] = None
+        context: Optional[str] = None,
+        custom_prompt: Optional[str] = None
     ) -> Tuple[str, List[ChatMessage]]:
         """채팅 메시지를 처리하고 응답을 생성합니다."""
         
@@ -123,13 +135,28 @@ class ChatService:
             })
         
         try:
-            if self.rag_chain:
-                # RAG 체인 사용
-                result = self.rag_chain.invoke({
-                    "input": message,
-                    "chat_history": chat_history
-                })
-                response_text = result["answer"]
+            # 커스텀 프롬프트가 있으면 동적으로 RAG 체인 생성
+            if custom_prompt:
+                rag_chain = self._create_rag_chain_with_prompt(custom_prompt)
+                if rag_chain:
+                    result = rag_chain.invoke({
+                        "input": message,
+                        "chat_history": chat_history
+                    })
+                    response_text = result["answer"]
+                else:
+                    response_text = "RAG 체인 생성에 실패했습니다."
+            elif hasattr(self, 'history_aware_retriever') and self.history_aware_retriever:
+                # 기본 RAG 체인 사용
+                default_rag_chain = self._create_rag_chain_with_prompt()
+                if default_rag_chain:
+                    result = default_rag_chain.invoke({
+                        "input": message,
+                        "chat_history": chat_history
+                    })
+                    response_text = result["answer"]
+                else:
+                    response_text = "기본 RAG 체인 생성에 실패했습니다."
             elif self.chat_llm:
                 # 기본 LLM만 사용
                 prompt = f"법률 상담 질문에 답변해주세요: {message}"
