@@ -1,0 +1,24 @@
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+python-dotenv==1.0.0
+python-multipart==0.0.6
+pydantic==2.8.2
+requests==2.31.0
+rapidfuzz==3.5.2
+
+# LangChain 관련 (호환성 확인된 버전)
+langchain==0.2.16
+langchain-upstage==0.1.8
+langchain-chroma==0.1.2
+langchain-community==0.2.16
+langchain-core==0.2.38
+
+# Vector DB
+chromadb==0.4.18
+
+# PDF 처리
+fpdf2==2.7.6
+reportlab==4.0.8
+
+# 기타 유틸리티
+aiofiles==23.2.1 
