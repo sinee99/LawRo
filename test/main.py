@@ -20,7 +20,7 @@ mpl.rcParams['axes.unicode_minus'] = False
 
 # 환경변수에서 API 키 로드
 load_dotenv()
-API_KEY = ""
+API_KEY = "API_KEY"
 OCR_URL = "https://ap-northeast-2.apistage.ai/v1/document-ai/ocr"
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
