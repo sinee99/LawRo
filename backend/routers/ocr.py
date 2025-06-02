@@ -6,9 +6,9 @@ import os
 import tempfile
 from typing import Dict, Any
 
-from ..models.response_models import OCRResponse
-from ..services.ocr_service import OCRService
-from ..utils.text_preprocessing import preprocess_ocr_text
+from models.response_models import OCRResponse
+from services.ocr_service import OCRService
+from utils.text_preprocessing import preprocess_ocr_text
 
 router = APIRouter()
 ocr_service = OCRService()
