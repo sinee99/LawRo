@@ -1,9 +1,9 @@
 # LawRo
-# 📝 근로계약서 분석 시스템 (OCR + LLM + RAG)
+## 📝 근로계약서 분석 시스템 (OCR + LLM + RAG)
 
 AI 기반으로 근로계약서 이미지를 분석하여 필수 항목 누락 여부, 근로기준법 위반 가능성 등을 자동 판단하고, PDF 보고서로 저장할 수 있는 통합 시스템입니다.
 
----
+
 
 ## 📦 주요 기능
 
@@ -15,7 +15,7 @@ AI 기반으로 근로계약서 이미지를 분석하여 필수 항목 누락 �
 - 🧾 **PDF 리포트 저장 및 다운로드**
 - 🖼️ **Streamlit 기반 UI 제공**
 
----
+
 
 ## 🖥️ 실행 화면
 
@@ -28,7 +28,7 @@ AI 기반으로 근로계약서 이미지를 분석하여 필수 항목 누락 �
   <img src="screenshots/pdf.png" width="45%">
 </p>
 
----
+
 
 ## 🚀 실행 방법
 
@@ -38,32 +38,21 @@ bash
 pip install -r requirements.txt
 ```
 
-# 환경 변수 설정
+## 환경 변수 설정
 ```
 cp .env.example .env
 ```
-# 또는 .env 파일에 아래처럼 작성
-# UPSTAGE_API_KEY=up_XXXXXXXXXXXXXXXX
+또는 .env 파일에 아래처럼 작성
+UPSTAGE_API_KEY=up_XXXXXXXXXXXXXXXX
 
-# 앱 실행
+## 앱 실행
 ```
 cd OCR
 streamlit run app.py
 ```
----
-🗂️ 폴더 구조
-OCR/
-├── app.py                 # Streamlit 메인 앱
-├── llm_utils.py           # solar-pro 의미 기반 판단
-├── rag_utils.py           # 법률 문서 RAG 검색
-├── pdf_export.py          # 분석 결과 PDF 저장
-├── ocr_result.json        # (샘플) OCR 결과 JSON
-├── .env                   # API 키 보관
-├── law_data/              # 내장된 법률 PDF
-├── chroma_db/             # 임베딩 벡터 저장소
-└── screenshots/           # 실행 화면 캡처
 
----
+
+
 ⚙️ 기술 스택
 
 | 기능       | 기술                                                                           |
