@@ -3,6 +3,16 @@ import json
 from langchain_upstage import ChatUpstage
 from langchain_core.messages import HumanMessage
 
+# 최저임금 정보
+MINIMUM_WAGE_BY_YEAR = {
+    2023: 9620,
+    2024: 9860,
+    2025: 10030
+}
+
+def get_minimum_wage(year: int) -> int:
+    return MINIMUM_WAGE_BY_YEAR.get(year, MINIMUM_WAGE_BY_YEAR[max(MINIMUM_WAGE_BY_YEAR)])
+
 
 def build_prompt(full_text: str) -> str:
     """
@@ -19,6 +29,8 @@ def build_prompt(full_text: str) -> str:
 - 생년월일
 - 근로계약기간
 - 근로시간
+- 근무일
+- 휴일
 - 휴게시간
 - 임금
 - 임금지급일
@@ -49,13 +61,18 @@ def call_llm_and_parse(prompt: str, api_key: str, model: str = "solar-pro") -> d
         return {"raw_response": text}
 
 
-def get_llm_judgment(text: str, api_key: str, model: str="solar-pro") -> str:
-    """
-    계약서 전체 텍스트를 입력받아 위반 여부와 위반 조항을 설명합니다.
-    """
+def get_llm_judgment(text: str, api_key: str, year: int, model: str="solar-pro") -> str:
+    min_wage = get_minimum_wage(year)
+
     prompt = f"""
 다음은 근로계약서에서 추출한 전체 내용입니다. 
 근로기준법 또는 외국인근로자보호 관련 법률을 위반하고 있는 조항이 있는지 판단해주세요.
+
+특히 다음 기준을 반드시 고려하세요:
+- {year}년 기준 한국의 최저임금은 시간당 {min_wage:,}원입니다.
+- 최저임금 미만일 경우 근로기준법 제6조 및 제55조 위반으로 간주됩니다.
+- 계약서상 명시된 임금이 일급/월급이라면, 근로시간으로 나누어 시간당 급여를 계산해 판단하세요.
+
 위반이 있다면 어떤 내용이 위반인지, 어떤 조항을 위반하는지 설명해주세요.
 
 [계약서 내용]

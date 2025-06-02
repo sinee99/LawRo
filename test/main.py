@@ -3,6 +3,7 @@ import cv2
 import json
 import requests
 import matplotlib.pyplot as plt
+from datetime import datetime
 from dotenv import load_dotenv
 from langchain_upstage import ChatUpstage
 from langchain_core.messages import HumanMessage
@@ -12,14 +13,14 @@ from llm_utils import (
     get_llm_judgment
 )
 
-# 한글 폰트 설정
+# 한글 폰트 설정git
 import matplotlib as mpl
 mpl.rcParams['font.family'] = 'AppleGothic'
 mpl.rcParams['axes.unicode_minus'] = False
 
 # 환경변수에서 API 키 로드
 load_dotenv()
-API_KEY = os.getenv("API_KEY")
+API_KEY = "up_KvE6eQR9HV5o3NAUoRNCITGI9s63v"
 OCR_URL = "https://ap-northeast-2.apistage.ai/v1/document-ai/ocr"
 HEADERS = {"Authorization": f"Bearer {API_KEY}"}
 
@@ -30,7 +31,7 @@ def review_and_edit(fields: dict) -> dict:
     직접 수정할 수 있도록 대화형 입력을 받습니다.
     엔터만 누르면 기존 값을 유지합니다.
     """
-    print("\n📋 추출된 항목을 검토하고 잘못된 값은 수정하세요. 엔터는 그대로 유지:")
+    print("\n 추출된 항목을 검토하고 잘못된 값은 수정하세요. 엔터는 그대로 유지:")
     def _recursive_edit(d, parent_key="") -> dict:
         for k, v in d.items():
             if isinstance(v, dict):
@@ -48,7 +49,7 @@ def review_and_edit(fields: dict) -> dict:
 
 def main():
     # 이미지 경로 입력
-    image_path = input("📁 분석할 근로계약서 이미지 경로를 입력하세요: ").strip()
+    image_path = input(" 분석할 근로계약서 이미지 경로를 입력하세요: ").strip()
     if not os.path.exists(image_path):
         print(f"❌ 파일이 존재하지 않습니다: {image_path}")
         return
@@ -67,7 +68,7 @@ def main():
     # OCR 결과 텍스트 합치기
     ocr_data = resp.json()
     full_text = " ".join(p.get("text", "") for p in ocr_data.get("pages", []))
-    print("\n📄 OCR 결과 일부:")
+    print("\n OCR 결과 일부:")
     print((full_text[:500] + '...') if len(full_text) > 500 else full_text)
 
     # LLM 프롬프트 생성 및 핵심 정보 추출
@@ -78,12 +79,12 @@ def main():
     extracted_fields = review_and_edit(extracted_fields)
 
     # 최종 결과 출력
-    print("\n📝 최종 확인된 결과:")
+    print("\n 최종 확인된 결과:")
     print(json.dumps(extracted_fields, indent=2, ensure_ascii=False))
 
     # 법률 위반 판단 추가 호출
     print("\n 법률 위반 판단 중…")
-    judgment = get_llm_judgment(full_text, API_KEY)
+    judgment = get_llm_judgment(full_text, API_KEY, year=datetime.now().year)
     print("⚖️ 법률 위반 판단 결과:\n", judgment)
 
     # OCR 박스 강조 이미지 만들기
