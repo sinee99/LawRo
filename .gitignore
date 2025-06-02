@@ -4,3 +4,12 @@ chroma_db/*.bin
 OCR/.env
 OCR/__pycache__/*
 OCR/chroma_db/*
+
+
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.bmp
+*.tiff
+*.ico
