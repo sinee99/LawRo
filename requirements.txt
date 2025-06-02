@@ -1,0 +1,76 @@
+# FastAPI 웹 프레임워크
+fastapi
+uvicorn[standard]
+python-multipart
+
+# 환경 설정
+python-dotenv
+
+# 데이터 검증 및 직렬화
+pydantic
+
+# HTTP 요청
+requests
+
+# 텍스트 매칭 및 검색
+rapidfuzz
+
+# LangChain 관련 (버전 호환성 확인됨)
+langchain
+langchain-upstage
+langchain-chroma
+langchain-community
+langchain-core
+
+# 벡터 데이터베이스
+chromadb
+
+# PDF 처리
+fpdf2
+reportlab
+PyPDF2
+
+# Streamlit (웹 인터페이스)
+streamlit
+
+# 파일 처리
+aiofiles
+
+# OpenAI (일부 기능에서 사용)
+openai
+
+# XML 처리 (표준 라이브러리)
+# xml.etree.ElementTree
+
+# UUID 생성 (표준 라이브러리)
+# uuid
+
+# 정규표현식 (표준 라이브러리) 
+# re
+
+# 시간 처리 (표준 라이브러리)
+# time
+
+# 파일 시스템 (표준 라이브러리)
+# os
+
+# 타입 힌팅 (표준 라이브러리)
+# typing
+
+# Base64 인코딩 (표준 라이브러리)
+# base64
+
+# 임시 파일 처리 (표준 라이브러리)
+# tempfile
+
+# 파일 유틸리티 (표준 라이브러리)
+# shutil
+
+# 비동기 처리 (표준 라이브러리)
+# asyncio
+
+# 입출력 스트림 (표준 라이브러리)
+# io
+
+# 경고 메시지 (표준 라이브러리)
+# warnings 

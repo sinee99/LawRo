@@ -1,6 +1,6 @@
 import os
 from langchain_upstage import UpstageEmbeddings
-from langchain_community.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain_upstage import ChatUpstage
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
