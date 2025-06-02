@@ -5,7 +5,6 @@ OCR/.env
 OCR/__pycache__/*
 OCR/chroma_db/*
 
-
 *.png
 *.jpg
 *.jpeg
@@ -13,3 +12,127 @@ OCR/chroma_db/*
 *.bmp
 *.tiff
 *.ico
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# 환경변수 및 설정 파일
+.env*
+config.env
+backend/.env*
+backend/config.env
+chatbot/.env*
+
+# 데이터베이스 및 저장소
+storage/
+*/chroma_db/
+*/storage/
+*.db
+*.sqlite
+*.sqlite3
+
+# 로그 파일
+*.log
+logs/
+*.log.*
+
+# 업로드 및 임시 파일
+uploads/
+temp/
+tmp/
+.tmp/
+*.tmp
+
+# IDE 및 에디터
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# 테스트 관련
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# 모델 및 체크포인트
+*.pkl
+*.pickle
+models/
+checkpoints/
+*.h5
+*.hdf5
+*.model
+
+# 문서 생성
+docs/_build/
+site/
+
+# 패키지 관리
+pip-log.txt
+pip-delete-this-directory.txt
+.installed.cfg
+
+# 가상환경
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# API 키 및 민감한 정보
+*_key.txt
+*_secret.txt
+*.pem
+*.key
+credentials.json
+
+# 백업 파일
+*.bak
+*.backup
+*.old
+
+# 대용량 데이터 파일
+*.pdf
+data/raw/
+data/large/
+*.zip
+*.tar.gz
+*.rar
+
+# 캐시
+.cache/
+*.cache
