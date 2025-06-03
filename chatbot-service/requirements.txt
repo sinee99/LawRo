@@ -1,0 +1,22 @@
+# FastAPI 웹 프레임워크
+FastAPI
+uvicorn
+
+# 데이터 검증
+pydantic
+
+# 환경 설정
+python-dotenv
+
+# LangChain 및 AI 관련
+langchain
+langchain-upstage
+langchain-chroma
+langchain-community
+langchain-core
+
+# 벡터 데이터베이스
+chromadb
+
+# HTTP 요청
+requests
