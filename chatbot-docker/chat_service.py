@@ -90,8 +90,8 @@ class ChatService:
             )
             
             self.default_qa_prompt_text = """질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.
-            📍답변 내용:  
-📍출처 문서: {context}"""
+
+참고 문서: {context}"""
             
             print("✅ RAG 체인 초기화 완료")
             
@@ -227,12 +227,14 @@ class ChatService:
         language_instruction = self._get_language_prompt(user_language)
         
         if custom_prompt:
+            # 커스텀 프롬프트에 context 변수가 없으면 추가
             if "{context}" not in custom_prompt:
                 prompt_text = f"{custom_prompt}\n\n참고 문서: {{context}}\n\n{language_instruction}"
             else:
                 prompt_text = f"{custom_prompt}\n\n{language_instruction}"
         else:
-            prompt_text = f"{self.default_qa_prompt_text}\n\n{language_instruction}"
+            # 기본 프롬프트에 context 변수 확실히 포함
+            prompt_text = f"질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.\n\n참고 문서: {{context}}\n\n{language_instruction}"
         
         qa_prompt = ChatPromptTemplate.from_messages([
             ("system", prompt_text),

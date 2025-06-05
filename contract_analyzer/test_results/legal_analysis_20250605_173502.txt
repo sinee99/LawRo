@@ -1,0 +1,9 @@
+==================================================
+전문 법률 분석 결과
+==================================================
+
+분석 시간: 2025-06-05 17:35:02
+사용자 ID: test_user_1749112324
+계약서 ID: contract_1749112324
+
+답변 생성 중 오류가 발생했습니다: Prompt must accept context as an input variable. Received prompt with input variables: ['chat_history', 'input', 'language_instruction']

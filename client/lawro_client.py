@@ -372,4 +372,4 @@ if __name__ == "__main__":
         print(f"활성 세션: {stats['stats'].get('total_sessions', 0)}개")
         print(f"총 메시지: {stats['stats'].get('total_messages', 0)}개")
     
-    print(f"\n🎉 테스트 완료!") 
+    print(f"\n🎉 테스트 완료!")
