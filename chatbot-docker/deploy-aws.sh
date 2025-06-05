@@ -68,7 +68,7 @@ sudo docker run -d \
     --restart unless-stopped \
     -p 8000:8000 \
     --env-file .env \
-    -v $(pwd)/storage:/app/storage \
+    -v $(pwd)/chroma_db:/app/chroma_db \
     lawro-chatbot:latest
 
 if [ $? -ne 0 ]; then

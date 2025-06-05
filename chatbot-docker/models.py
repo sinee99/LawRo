@@ -14,6 +14,7 @@ class ChatRequest(BaseModel):
     session_id: Optional[str] = Field(None, description="세션 ID")
     context: Optional[str] = Field(None, description="문맥 정보 (계약서 내용)")
     custom_prompt: Optional[str] = Field(None, description="커스텀 QA 프롬프트")
+    user_language: Optional[str] = Field("korean", description="사용자 언어 (korean, english, chinese, vietnamese, etc.)")
 
 class ChatResponse(BaseModel):
     """채팅 응답 모델"""
