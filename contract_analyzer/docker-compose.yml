@@ -1,0 +1,37 @@
+version: '3.8'
+
+services:
+  chatbot:
+    build: ../chatbot-docker
+    container_name: lawro-chatbot
+    ports:
+      - "8001:8000"
+    environment:
+      - UPSTAGE_API_KEY=${UPSTAGE_API_KEY}
+    volumes:
+      - ../chatbot-docker/chroma_db:/app/chroma_db
+      - ../chatbot-docker/data:/app/data
+    networks:
+      - lawro-network
+    restart: unless-stopped
+    
+  contract-analyzer:
+    build: .
+    container_name: lawro-contract-analyzer
+    ports:
+      - "8000:8000"
+    environment:
+      - CHATBOT_URL=http://chatbot:8000  # 컨테이너 간 통신
+      - CHATBOT_ENV=docker
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION}
+    depends_on:
+      - chatbot
+    networks:
+      - lawro-network
+    restart: unless-stopped
+
+networks:
+  lawro-network:
+    driver: bridge 

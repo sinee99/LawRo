@@ -1,0 +1,97 @@
+{
+  "family": "lawro-contract-analyzer",
+  "networkMode": "awsvpc",
+  "requiresCompatibilities": ["FARGATE"],
+  "cpu": "1024",
+  "memory": "2048",
+  "executionRoleArn": "arn:aws:iam::{AWS_ACCOUNT_ID}:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::{AWS_ACCOUNT_ID}:role/ecsTaskRole",
+  "containerDefinitions": [
+    {
+      "name": "chatbot",
+      "image": "{AWS_ACCOUNT_ID}.dkr.ecr.{AWS_REGION}.amazonaws.com/lawro-chatbot:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "UPSTAGE_API_KEY",
+          "value": "{UPSTAGE_API_KEY}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/lawro-chatbot",
+          "awslogs-region": "{AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    },
+    {
+      "name": "contract-analyzer",
+      "image": "{AWS_ACCOUNT_ID}.dkr.ecr.{AWS_REGION}.amazonaws.com/lawro-contract-analyzer:latest",
+      "portMappings": [
+        {
+          "containerPort": 8000,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "dependsOn": [
+        {
+          "containerName": "chatbot",
+          "condition": "HEALTHY"
+        }
+      ],
+      "environment": [
+        {
+          "name": "CHATBOT_URL",
+          "value": "http://localhost:8000"
+        },
+        {
+          "name": "CHATBOT_ENV",
+          "value": "aws"
+        },
+        {
+          "name": "AWS_DEFAULT_REGION",
+          "value": "{AWS_REGION}"
+        },
+        {
+          "name": "S3_BUCKET_NAME",
+          "value": "{S3_BUCKET_NAME}"
+        },
+        {
+          "name": "UPSTAGE_API_KEY",
+          "value": "{UPSTAGE_API_KEY}"
+        }
+      ],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/lawro-contract-analyzer",
+          "awslogs-region": "{AWS_REGION}",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 60
+      }
+    }
+  ]
+} 

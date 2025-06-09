@@ -1,1 +1,38 @@
+# Environment files
 .env
+.env.local
+.env.production
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+venv/
+env/
+
+# Docker
+docker-compose.override.yml
+.docker/
+
+# Data volumes
+chroma_db/
+volumes/
+tmp/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Test results
+test_results/

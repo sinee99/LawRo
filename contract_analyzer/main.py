@@ -17,3 +17,7 @@ app.include_router(analyze_copy.router, prefix="/api")
 @app.get("/")
 def root():
     return {"message": "Contract Analyzer API is running"}
+
+@app.get("/health")
+def health_check():
+    return {"status": "healthy", "service": "contract-analyzer"}

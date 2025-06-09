@@ -10,13 +10,15 @@ class ChatBotConfig:
     # 환경별 ChatBot 서버 URL 설정
     CHATBOT_SERVERS = {
         "development": "http://localhost:8001",  # 로컬 개발
+        "docker": "http://chatbot:8000",  # Docker 컨테이너 간 통신
+        "aws": "http://localhost:8000",  # AWS ECS Task 내 컨테이너 간 통신
         "staging": "http://staging-chatbot.example.com:8000",  # 스테이징
         "production": "http://16.176.26.197:8000"  # 운영 서버
     }
     
     def __init__(self):
         # 환경변수에서 설정 읽기
-        self.environment = os.getenv("CHATBOT_ENV", "production")
+        self.environment = os.getenv("CHATBOT_ENV", "aws")
         self.custom_url = os.getenv("CHATBOT_URL")
         self.timeout = int(os.getenv("CHATBOT_TIMEOUT", "60"))
         self.max_retries = int(os.getenv("CHATBOT_MAX_RETRIES", "3"))
@@ -28,7 +30,7 @@ class ChatBotConfig:
         if self.custom_url:
             return self.custom_url.rstrip('/')
         
-        return self.CHATBOT_SERVERS.get(self.environment, self.CHATBOT_SERVERS["production"])
+        return self.CHATBOT_SERVERS.get(self.environment, self.CHATBOT_SERVERS["aws"])
     
     @property 
     def endpoints(self) -> Dict[str, str]:
