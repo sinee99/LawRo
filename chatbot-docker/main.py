@@ -56,37 +56,7 @@ async def health_check():
         }
     }
 
-@app.post("/chat")
-async def chat_message(request: ChatRequest):
-    """
-    채팅 메시지를 보내고 AI 응답을 받습니다.
-    """
-    start_time = time.time()
-    
-    try:
-        # 챗봇 응답 생성
-        response_message, chat_history = await chat_service.process_message(
-            message=request.message,
-            session_id=request.session_id,
-            context=request.context,
-            custom_prompt=request.custom_prompt,
-            user_language=request.user_language
-        )
-        
-        processing_time = time.time() - start_time
-        
-        return {
-            "response": response_message,
-            "chat_history": chat_history,
-            "processing_time": processing_time
-        }
-        
-    except Exception as e:
-        processing_time = time.time() - start_time
-        raise HTTPException(
-            status_code=500,
-            detail=f"오류가 발생했습니다: {str(e)}"
-        )
+# 기존 /chat 엔드포인트는 /chat/send로 통합됨
 
 @app.post("/chat/send", response_model=ChatResponse)
 async def send_chat_message(request: ChatRequest):
@@ -140,19 +110,7 @@ async def get_chat_history(session_id: str):
             detail=f"채팅 히스토리 조회 중 오류가 발생했습니다: {str(e)}"
         )
 
-@app.post("/create_session")
-async def create_session():
-    """새로운 채팅 세션을 생성합니다."""
-    try:
-        session_id = await chat_service.create_new_session()
-        return {
-            "session_id": session_id
-        }
-    except Exception as e:
-        raise HTTPException(
-            status_code=500, 
-            detail=f"세션 생성 중 오류가 발생했습니다: {str(e)}"
-        )
+# 기존 /create_session 엔드포인트는 /chat/new-session으로 통합됨
 
 @app.post("/chat/new-session")
 async def create_new_chat_session():
@@ -206,6 +164,6 @@ if __name__ == "__main__":
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
-        port=8000,
+        port=8001,
         reload=True
     ) 

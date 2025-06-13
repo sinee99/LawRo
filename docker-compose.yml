@@ -1,0 +1,95 @@
+version: '3.8'
+
+services:
+  # 메인 API 서비스 (8000 포트)
+  main-api:
+    build:
+      context: ./main-docker
+      dockerfile: Dockerfile
+    container_name: lawro-main-api
+    ports:
+      - "8000:8000"
+    environment:
+      - CHATBOT_SERVICE_URL=http://chatbot:8001
+      - CONTRACT_SERVICE_URL=http://contract:8002
+      - JWT_SECRET_KEY=${JWT_SECRET_KEY:-lawro-secret-key-change-in-production}
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID}
+      - FIREBASE_PRIVATE_KEY_ID=${FIREBASE_PRIVATE_KEY_ID}
+      - FIREBASE_PRIVATE_KEY=${FIREBASE_PRIVATE_KEY}
+      - FIREBASE_CLIENT_EMAIL=${FIREBASE_CLIENT_EMAIL}
+      - FIREBASE_CLIENT_ID=${FIREBASE_CLIENT_ID}
+      - FIREBASE_SERVICE_ACCOUNT_PATH=${FIREBASE_SERVICE_ACCOUNT_PATH}
+    volumes:
+      - ./firebase-credentials:/app/credentials:ro
+    depends_on:
+      - chatbot
+      - contract
+    networks:
+      - lawro-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+  # 챗봇 서비스 (8001 포트)
+  chatbot:
+    build:
+      context: ./chatbot-docker
+      dockerfile: Dockerfile
+    container_name: lawro-chatbot
+    ports:
+      - "8001:8001"
+    environment:
+      - UPSTAGE_API_KEY=${UPSTAGE_API_KEY}
+      - PYTHONPATH=/app
+    volumes:
+      - ./chatbot-docker/chroma_db:/app/chroma_db
+    networks:
+      - lawro-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  # 계약서 분석 서비스 (8002 포트)
+  contract:
+    build:
+      context: ./contract_analyzer
+      dockerfile: Dockerfile
+    container_name: lawro-contract-analyzer
+    ports:
+      - "8002:8002"
+    environment:
+      - UPSTAGE_API_KEY=${UPSTAGE_API_KEY}
+      - AWS_ACCESS_KEY_ID=${AWS_ACCESS_KEY_ID}
+      - AWS_SECRET_ACCESS_KEY=${AWS_SECRET_ACCESS_KEY}
+      - AWS_DEFAULT_REGION=${AWS_DEFAULT_REGION:-ap-northeast-2}
+      - S3_BUCKET_NAME=${S3_BUCKET_NAME}
+      - PYTHONPATH=/app
+    volumes:
+      - ./contract_analyzer/uploads:/app/uploads
+      - ./contract_analyzer/temp:/app/temp
+    networks:
+      - lawro-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+networks:
+  lawro-network:
+    driver: bridge
+
+volumes:
+  chroma_db:
+  contract_uploads:
+  firebase_credentials: 

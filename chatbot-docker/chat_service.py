@@ -234,7 +234,8 @@ class ChatService:
                 prompt_text = f"{custom_prompt}\n\n{language_instruction}"
         else:
             # 기본 프롬프트에 context 변수 확실히 포함
-            prompt_text = f"질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요. 관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.\n\n참고 문서: {{context}}\n\n{language_instruction}"
+            prompt_text = f"대답 시, 언어에 맞게 공손한 말투로 답변해라. 질문에 검색된 문서 내용을 바탕으로 답변하세요. 답을 모르면 모른다고 하세요. 답변은 20자 이내로 간결하고 명확하게 작성하세요. 법률과 관련된 질문에만 답변하세요.
+            관련되지 않을 경우 법률과 관련된 질문을 할 수 있도록 유도하는 말을 해주세요.\n\n참고 문서: {{context}}\n\n{language_instruction}"
         
         qa_prompt = ChatPromptTemplate.from_messages([
             ("system", prompt_text),
